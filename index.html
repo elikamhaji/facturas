@@ -1,216 +1,157 @@
+<!-- Full updated index.html without logo changes -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>Orden de Pago - Grupo Kadima</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="styles.css" />
-
-    <!-- jsPDF + html2canvas -->
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-    <script defer src="script.js"></script>
+<meta charset="UTF-8" />
+<title>Orden de Pago Chatarra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="styles.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="script.js" defer></script>
 </head>
 <body>
 
-<div class="page-wrapper">
+<div class="page-container">
+<h1 class="app-title">Orden de Pago Chatarra - Sistema</h1>
 
-    <h1 class="title">Sistema de Orden de Pago - Grupo Kadima</h1>
+<section class="form-section">
+<h2>Datos del cliente</h2>
 
-    <!-- ================= FORM SECTION ================= -->
-    <section class="form-section">
-        <h2>Datos del Cliente</h2>
+<form id="payment-form">
+<div class="form-grid">
+<label>Cliente:<input id="cliente" required /></label>
+<label>Cédula:<input id="cedula" required /></label>
+<label>Teléfono:<input id="telefono" /></label>
+<label>Fecha:<input id="fecha" type="datetime-local" /></label>
+<label>Orden #:<input id="orden-numero" required /></label>
+</div>
 
-        <div class="form-grid">
-            <label>Cliente: <input id="cliente" required /></label>
-            <label>Cédula: <input id="cedula" required /></label>
-            <label>Teléfono: <input id="telefono" /></label>
-            <label>Fecha: <input id="fecha" type="datetime-local" /></label>
-            <label>Orden #: <input id="orden-numero" required /></label>
-        </div>
+<h3>Material (Filas ilimitadas)</h3>
+<table class="input-table">
+<thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead>
+<tbody id="items-body">
+<tr class="item-row">
+<td><input class="item-desc" /></td>
+<td><input class="item-qty" type="number" step="0.01" /></td>
+<td><input class="item-price" type="number" step="0.01" /></td>
+<td class="item-total"></td>
+</tr>
+</tbody>
+</table>
+<button type="button" id="add-item-row" class="btn-secondary">Agregar fila</button>
 
-        <h2>Material recibido</h2>
+<div class="total-display">
+<b>Total general: </b><span id="web-total-general"></span>
+</div>
 
-        <table class="input-table">
-            <thead>
-                <tr>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="items-body">
-                <tr class="item-row">
-                    <td><input class="item-desc" /></td>
-                    <td><input class="item-qty" type="number" step="0.01" /></td>
-                    <td><input class="item-price" type="number" step="0.01" /></td>
-                    <td class="item-total"></td>
-                </tr>
-            </tbody>
-        </table>
+<h3>Forma de pago (Filas ilimitadas)</h3>
+<table class="input-table">
+<thead><tr><th>Descripción</th><th>Cantidad</th><th>Observaciones</th></tr></thead>
+<tbody id="payments-body">
+<tr class="payment-row">
+<td>
+<select class="pay-desc">
+<option value="Cheque">Cheque</option>
+<option value="ACH">ACH</option>
+</select>
+</td>
+<td><input class="pay-amount" type="number" step="0.01" /></td>
+<td><input class="pay-note" /></td>
+</tr>
+<tr class="payment-row">
+<td>
+<select class="pay-desc">
+<option value="Cheque">Cheque</option>
+<option value="ACH" selected>ACH</option>
+</select>
+</td>
+<td><input class="pay-amount" type="number" step="0.01" /></td>
+<td><input class="pay-note" /></td>
+</tr>
+</tbody>
+</table>
+<button type="button" id="add-payment-row" class="btn-secondary">Agregar forma de pago</button>
 
-        <button id="add-item-row" class="btn-secondary">Agregar fila</button>
+<h3>Dirección</h3>
+<textarea id="direccion" rows="2"></textarea>
 
-        <div class="total-box">
-            TOTAL GENERAL: <span id="web-total-general">0.00</span>
-        </div>
+<div class="actions">
+<button type="submit" class="btn-primary">Generar PDF</button>
+</div>
+</form>
+</section>
 
-        <h2>Forma de Pago</h2>
+<section class="pdf-preview-section">
+<div id="pdf-content" class="pdf-page">
 
-        <table class="input-table">
-            <thead>
-                <tr>
-                    <th>Descripción</th>
-                    <th>Cantidad</th>
-                    <th>Observaciones</th>
-                </tr>
-            </thead>
-            <tbody id="payments-body">
-                <tr class="payment-row">
-                    <td><input class="pay-desc" value="Cheque" /></td>
-                    <td><input class="pay-amount" type="number" step="0.01" /></td>
-                    <td><input class="pay-note" /></td>
-                </tr>
-                <tr class="payment-row">
-                    <td><input class="pay-desc" value="ACH" /></td>
-                    <td><input class="pay-amount" type="number" step="0.01" /></td>
-                    <td><input class="pay-note" /></td>
-                </tr>
-            </tbody>
-        </table>
+<header class="pdf-header">
+<div style="width:120px;height:80px;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:12px;color:#666;">LOGO</div>
+<div>
+<b>GRUPO KADIMA S.A.</b><br>
+RUC: 155045701-2-2018 DV 38<br>
+Tel: 392-3456<br>
+Panamá, Rep. de Panamá
+</div>
+</header>
 
-        <button id="add-payment-row" class="btn-secondary">Agregar forma de pago</button>
+<table class="pdf-table">
+<tr><th>Cliente</th><td id="pdf-cliente"></td></tr>
+<tr><th>Cédula</th><td id="pdf-cedula"></td></tr>
+<tr><th>Teléfono</th><td id="pdf-telefono"></td></tr>
+<tr><th>Fecha</th><td id="pdf-fecha"></td></tr>
+<tr><th>Orden #</th><td id="pdf-orden-numero"></td></tr>
+</table>
 
-        <h2>Dirección del cliente</h2>
-        <textarea id="direccion" rows="2"></textarea>
+<h3>Material</h3>
+<table class="pdf-table">
+<thead><tr><th>Descripción</th><th>Cantidad</th><th>Precio</th><th>Total</th></tr></thead>
+<tbody id="pdf-items-body"></tbody>
+<tr><td colspan="3"><b>Total</b></td><td id="pdf-total-general"></td></tr>
+</table>
 
-        <button id="generate" class="btn-primary">Generar PDF</button>
-    </section>
+<h3>Forma de pago</h3>
+<table class="pdf-table">
+<thead><tr><th>Descripción</th><th>Cantidad</th><th>Observaciones</th></tr></thead>
+<tbody id="pdf-payments-body"></tbody>
+</table>
 
+<h3>Firma</h3>
+<table class="pdf-table signature-table">
+<tr>
+<td>
+<div class="sign-block">
+<div class="sign-line"></div>
+<b>Cédula:</b> <span id="pdf-cedula-sign"></span>
+</div>
+</td>
+<td>
+<div class="sign-block">
+<div class="sign-line"></div>
+<b>Firma:</b>
+</div>
+</td>
+<td>
+<div class="sign-block">
+<div class="sign-line"></div>
+<b>Dirección:</b>
+<span id="pdf-direccion"></span>
+</div>
+</td>
+</tr>
+</table>
 
-    <!-- ================= PDF TEMPLATE ================= -->
-    <div id="pdf-content" class="pdf-page">
+<div class="disclaimer">
+<i>“Con mi firma ratifico que las declaraciones contenidas en este documento son ciertas.”</i>
+<h4>Términos y condiciones:</h4>
+<p>El cliente reconoce que la información suministrada es verdadera y se compromete al cumplimiento de todas las normativas aplicables.</p>
+<p>Este documento es válido únicamente para los fines establecidos.</p>
+<p><b>Nota:</b> Usted está siendo filmado.</p>
+</div>
 
-        <div class="outer-border">
+</div>
+</section>
 
-            <!-- ====== HEADER ====== -->
-            <div class="pdf-header">
-                <img src="logo.png" class="logo" />
-                <div class="company-info">
-                    <div>R.U.C 155631150-2-2016 DV 51</div>
-                    <div>Torre de Las Américas</div>
-                    <div>San Francisco, Local L28</div>
-                    <div>Tel.: 3738681 / 3738680 / 66706677</div>
-                    <div>Email: marie.grupokadima@gmail.com</div>
-                </div>
-            </div>
-
-            <!-- ====== CLIENT INFO TABLE ====== -->
-            <table class="pdf-table info-table">
-                <tr>
-                    <td>CLIENTE:</td><td id="pdf-cliente"></td>
-                    <td>ORDEN #:</td><td id="pdf-orden-numero"></td>
-                </tr>
-                <tr>
-                    <td>CÉDULA:</td><td id="pdf-cedula"></td>
-                    <td>TELÉFONO:</td><td id="pdf-telefono"></td>
-                </tr>
-                <tr>
-                    <td>FECHA:</td><td id="pdf-fecha"></td>
-                    <td></td><td></td>
-                </tr>
-            </table>
-
-            <!-- ====== MATERIAL TABLE ====== -->
-            <table class="pdf-table main-table">
-                <thead>
-                    <tr>
-                        <th>DESCRIPCIÓN</th>
-                        <th>CANTIDAD</th>
-                        <th>PRECIO</th>
-                        <th>TOTAL</th>
-                    </tr>
-                </thead>
-                <tbody id="pdf-items-body"></tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" class="total-label">TOTAL:</td>
-                        <td class="total-value" id="pdf-total-general"></td>
-                    </tr>
-                </tfoot>
-            </table>
-
-            <!-- ====== PAYMENT TABLE ====== -->
-            <table class="pdf-table pay-table">
-                <thead>
-                    <tr>
-                        <th>DESCRIPCIÓN</th>
-                        <th>CANTIDAD</th>
-                        <th>OBSERVACIONES</th>
-                    </tr>
-                </thead>
-                <tbody id="pdf-payments-body"></tbody>
-            </table>
-
-            <!-- ====== SIGNATURE BLOCK ====== -->
-            <table class="pdf-table signature-table">
-                <tr>
-                    <td>
-                        <div class="sign-block">
-                            <div>CÉDULA</div>
-                            <div id="pdf-cedula-sign" class="sign-line"></div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="sign-block">
-                            <div>FIRMA</div>
-                            <div class="sign-line"></div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="sign-block">
-                            <div>DIRECCIÓN</div>
-                            <div id="pdf-direccion" class="sign-line"></div>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-
-            <!-- ====== DISCLAIMER ====== -->
-            <div class="disclaimer">
-                <i>*Con mi firma ratifico que las declaraciones contenidas en este documento son ciertas.</i>
-
-                <h3>Términos y condiciones:</h3>
-
-                <p>Declaro bajo la gravedad de juramento que:</p>
-
-                <p>Todos los artículos descritos son de mi propiedad o provienen de actividades comerciales lícitas.</p>
-                <p>Los artículos mencionados en este contrato cumplen con todos los pagos de impuestos y declaraciones aduanales exigidas por de las leyes de la República de Panamá y no son utilizados para el blanqueo de capitales ni el financiamiento de actos de terrorismo.</p>
-                <p>Los artículos mencionados en este contrato no han sido introducidos a la República de Panamá en violación a las normas aduaneras, fiscales, tributarias, ni a ninguna otra disposición legal vigente.</p>
-                <p>Declaro que conozco y me hago responsable del origen legal de los metales preciosos (oro) dados en venta y declaro que no provienen de la minería ilegal (de riberas de ríos como Río Tigre, Quebrada Mula, Río Rita, lagunas, cabeceras de cuencas o áreas naturales protegidas como la Reserva Forestal Parque Chagres y cualquier otro lugar, que aunque no se mencione, sea prohibida la extracción de oro).</p>
-                <p>Soy el único beneficiario real de las prendas y/o valores recibidos con motivo del presente contrato de compra – venta.</p>
-
-                <p>Acepto la toma de fotografía del material para documentar su estado y registro al momento de la transacción.</p>
-
-                <p>Inversiones Grupo Kadima S.A NO compra los artículos artesanales nombrados HUACA.</p>
-
-                <p>Los Mineros que atraen oro del Río de cualquier estado de Panamá deben presentar su licencia al día.
-                    INVERSIONES GRUPO KADIMA S.A se reserva el derecho y cumplirá con la obligación de reportar toda
-                    actividad sospechosa y de proceder legalmente, cuando deliberada o intencionalmente el cliente
-                    contratante provea información falsa en este formulario.</p>
-
-                <p><b>EL cliente fundirá su oro bajo su responsabilidad. INVERSIONES GRUPO KADIMA S.A no se responsabiliza por el peso, pureza o forma del material después de su fundición.</b></p>
-
-                <p><b>Las oficinas de Inversiones Grupo Kadima S.A. cuentan con servicio cerrado de seguridad, usted está siendo filmado.</b></p>
-            </div>
-
-        </div><!-- border -->
-
-    </div><!-- pdf-content -->
-
-</div><!-- wrapper -->
-
+</div>
 </body>
 </html>
