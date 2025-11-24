@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Orden de Pago Chatarra - Generador PDF</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <h1>Sistema Generador PDF</h1>
+  <p>Tu sistema está listo. Llena los campos y genera el PDF.</p>
+  <form id="form">
+    Cliente: <input id="cliente" /><br/>
+    Cedula: <input id="cedula" /><br/>
+    Telefono: <input id="telefono" /><br/>
+    Fecha: <input id="fecha" type="datetime-local" /><br/>
+    Orden #: <input id="orden" /><br/><br/>
+    <button type="button" onclick="generatePDF()">Generar PDF</button>
+  </form>
+
+  <div id="pdf" style="width:800px; padding:20px; background:white; font-family:Arial;">
+    <h2>GRUPO KADIMA</h2>
+    <p><b>CLIENTE:</b> <span id="pdf-cliente"></span></p>
+    <p><b>CEDULA:</b> <span id="pdf-cedula"></span></p>
+    <p><b>TELEFONO:</b> <span id="pdf-telefono"></span></p>
+    <p><b>FECHA:</b> <span id="pdf-fecha"></span></p>
+    <p><b>ORDEN DE PAGO:</b> <span id="pdf-orden"></span></p>
+    <br/><br/>
+    <p><b>Firma:</b> ____________________________</p>
+  </div>
+</body>
+</html>
