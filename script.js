@@ -1,4 +1,3 @@
-// Full script.js with dropdown + signature support
 
 function recalcTotals(){
  let rows=document.querySelectorAll(".item-row");
@@ -22,7 +21,6 @@ function fillPdf(){
  document.getElementById("pdf-cedula-sign").textContent=document.getElementById("cedula").value;
  document.getElementById("pdf-direccion").textContent=document.getElementById("direccion").value;
 
- // MATERIAL
  let pdfItems=document.getElementById("pdf-items-body");
  pdfItems.innerHTML="";
  let rows=document.querySelectorAll(".item-row");
@@ -43,7 +41,6 @@ function fillPdf(){
  });
  document.getElementById("pdf-total-general").textContent=total.toFixed(2);
 
- // PAGOS
  let pdfPay=document.getElementById("pdf-payments-body");
  pdfPay.innerHTML="";
  let pays=document.querySelectorAll(".payment-row");
@@ -91,12 +88,7 @@ document.getElementById("add-payment-row").onclick=function(){
  let b=document.getElementById("payments-body");
  let r=document.createElement("tr");
  r.className="payment-row";
- r.innerHTML=`<td>
-   <select class='pay-desc'>
-     <option value="Cheque">Cheque</option>
-     <option value="ACH">ACH</option>
-   </select>
- </td>
+ r.innerHTML=`<td><input class='pay-desc' /></td>
  <td><input class='pay-amount' type='number' step='0.01' /></td>
  <td><input class='pay-note' /></td>`;
  b.appendChild(r);
