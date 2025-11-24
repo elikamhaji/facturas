@@ -10,26 +10,256 @@
   <script src="script.js" defer></script>
 </head>
 <body>
-  <h1>Sistema Generador PDF</h1>
-  <p>Tu sistema está listo. Llena los campos y genera el PDF.</p>
-  <form id="form">
-    Cliente: <input id="cliente" /><br/>
-    Cedula: <input id="cedula" /><br/>
-    Telefono: <input id="telefono" /><br/>
-    Fecha: <input id="fecha" type="datetime-local" /><br/>
-    Orden #: <input id="orden" /><br/><br/>
-    <button type="button" onclick="generatePDF()">Generar PDF</button>
-  </form>
+  <div class="page-container">
+    <h1 class="app-title">Orden de Pago Chatarra - Generador PDF</h1>
 
-  <div id="pdf" style="width:800px; padding:20px; background:white; font-family:Arial;">
-    <h2>GRUPO KADIMA</h2>
-    <p><b>CLIENTE:</b> <span id="pdf-cliente"></span></p>
-    <p><b>CEDULA:</b> <span id="pdf-cedula"></span></p>
-    <p><b>TELEFONO:</b> <span id="pdf-telefono"></span></p>
-    <p><b>FECHA:</b> <span id="pdf-fecha"></span></p>
-    <p><b>ORDEN DE PAGO:</b> <span id="pdf-orden"></span></p>
-    <br/><br/>
-    <p><b>Firma:</b> ____________________________</p>
+    <section class="form-section">
+      <h2>Datos del cliente</h2>
+      <form id="payment-form">
+        <div class="form-grid">
+          <label>
+            Cliente:
+            <input type="text" id="cliente" required />
+          </label>
+          <label>
+            Cédula:
+            <input type="text" id="cedula" required />
+          </label>
+          <label>
+            Teléfono:
+            <input type="text" id="telefono" />
+          </label>
+          <label>
+            Fecha:
+            <input type="datetime-local" id="fecha" />
+          </label>
+          <label>
+            Orden de pago #:
+            <input type="text" id="orden-numero" required />
+          </label>
+        </div>
+
+        <h3>Descripción del material</h3>
+        <p class="hint">Puedes agregar tantas filas como necesites.</p>
+        <table class="input-table" id="items-table">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th style="width: 90px;">Cantidad</th>
+              <th style="width: 120px;">Precio unitario</th>
+            </tr>
+          </thead>
+          <tbody id="items-body">
+            <tr class="item-row">
+              <td><input type="text" class="item-desc" /></td>
+              <td><input type="number" step="0.01" class="item-qty" /></td>
+              <td><input type="number" step="0.01" class="item-price" /></td>
+            </tr>
+            <tr class="item-row">
+              <td><input type="text" class="item-desc" /></td>
+              <td><input type="number" step="0.01" class="item-qty" /></td>
+              <td><input type="number" step="0.01" class="item-price" /></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" id="add-item-row" class="btn-secondary">Agregar fila</button>
+
+        <h3>Forma de pago</h3>
+        <table class="input-table">
+          <thead>
+            <tr>
+              <th>Descripción</th>
+              <th style="width: 120px;">Cantidad</th>
+              <th>Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Cheque</td>
+              <td><input type="number" step="0.01" id="pago-cheque-cantidad" /></td>
+              <td><input type="text" id="pago-cheque-observaciones" /></td>
+            </tr>
+            <tr>
+              <td>ACH</td>
+              <td><input type="number" step="0.01" id="pago-ach-cantidad" /></td>
+              <td><input type="text" id="pago-ach-observaciones" /></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Dirección del cliente</h3>
+        <textarea id="direccion" rows="2" placeholder="Dirección del cliente"></textarea>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary">Generar PDF</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="pdf-preview-section">
+      <h2>Vista previa del PDF (estructura)</h2>
+      <p class="hint">Este bloque se usa para generar el PDF. Se rellena automáticamente.</p>
+
+      <div id="pdf-content" class="pdf-page">
+        <header class="pdf-header">
+          <div class="pdf-logo">
+            <div class="logo-mark">&#9654;&#9654;&#9654;</div>
+            <div class="logo-text">
+              <div class="logo-title">GRUPO KADIMA</div>
+            </div>
+          </div>
+          <div class="pdf-company-info">
+            <div>R.U.C 155631150-2-2016 DV 51</div>
+            <div>Torre de Las Américas</div>
+            <div>San Francisco, Local L28</div>
+            <div>Tel.: 3738681 / 3738680 / 66706677</div>
+            <div>E-mail: marie.grupokadima@gmail.com</div>
+          </div>
+        </header>
+
+        <section class="pdf-block">
+          <table class="pdf-table pdf-table-compact">
+            <tr>
+              <td style="width: 20%;">CLIENTE:</td>
+              <td style="width: 35%;"><span id="pdf-cliente"></span></td>
+              <td style="width: 20%;">ORDEN DE PAGO CHATARRA Nº:</td>
+              <td style="width: 25%;"><span id="pdf-orden-numero"></span></td>
+            </tr>
+            <tr>
+              <td>CÉDULA:</td>
+              <td><span id="pdf-cedula"></span></td>
+              <td>TELÉFONO:</td>
+              <td><span id="pdf-telefono"></span></td>
+            </tr>
+            <tr>
+              <td>FECHA:</td>
+              <td><span id="pdf-fecha"></span></td>
+              <td></td>
+              <td></td>
+            </tr>
+          </table>
+        </section>
+
+        <section class="pdf-block">
+          <table class="pdf-table">
+            <thead>
+              <tr>
+                <th>DESCRIPCIÓN</th>
+                <th style="width: 80px;">CANTIDAD</th>
+                <th style="width: 110px;">PRECIO UNITARIO</th>
+                <th style="width: 110px;">TOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="pdf-items-body">
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="pdf-total-label">TOTAL:</td>
+                <td class="pdf-total-value"><span id="pdf-total-general"></span></td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+
+        <section class="pdf-block">
+          <p class="pdf-text">
+            SOLICITO QUE EL PAGO POR CONCEPTO DE LA VENTA DE MATERIAL DEL DÍA DE HOY, SEA REALIZADO DE LA SIGUIENTE MANERA:
+          </p>
+          <table class="pdf-table">
+            <thead>
+              <tr>
+                <th>DESCRIPCIÓN</th>
+                <th style="width: 110px;">CANTIDAD</th>
+                <th>OBSERVACIONES</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CHEQUE</td>
+                <td><span id="pdf-pago-cheque-cantidad"></span></td>
+                <td><span id="pdf-pago-cheque-observaciones"></span></td>
+              </tr>
+              <tr>
+                <td>ACH</td>
+                <td><span id="pdf-pago-ach-cantidad"></span></td>
+                <td><span id="pdf-pago-ach-observaciones"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="pdf-block pdf-signature-section">
+          <table class="pdf-table pdf-table-compact">
+            <tr>
+              <td style="width: 33%;">
+                <div class="pdf-signature-box">
+                  <div class="label">CÉDULA</div>
+                  <div class="value"><span id="pdf-cedula-sign"></span></div>
+                </div>
+              </td>
+              <td style="width: 33%;">
+                <div class="pdf-signature-box">
+                  <div class="label">FIRMA</div>
+                  <div class="value pdf-signature-line">&nbsp;</div>
+                </div>
+              </td>
+              <td style="width: 33%;">
+                <div class="pdf-signature-box">
+                  <div class="label">DIRECCIÓN</div>
+                  <div class="value"><span id="pdf-direccion"></span></div>
+                </div>
+              </td>
+            </tr>
+          </table>
+        </section>
+
+        <section class="pdf-block pdf-terms">
+          <p class="pdf-text"><strong>*Con mi firma ratifico que las declaraciones contenidas en este documento son ciertas.</strong></p>
+          <p class="pdf-text"><strong>Términos y condiciones:</strong></p>
+
+          <p class="pdf-text">Declaro bajo la gravedad de juramento que:</p>
+          <p class="pdf-text">Todos los artículos descritos son de mi propiedad o provienen de actividades comerciales lícitas.</p>
+          <p class="pdf-text">
+            Los artículos mencionados en este contrato han cumplido con los pagos de impuestos y declaraciones aduanales exigidas por las leyes de la
+            República de Panamá y no son utilizados para el blanqueo de capitales ni el financiamiento de actos de terrorismo.
+          </p>
+          <p class="pdf-text">
+            Los artículos mencionados en este contrato no han sido introducidos a la República de Panamá en violación a las normas aduaneras, fiscales,
+            tributarias ni a ninguna otra disposición legal vigente.
+          </p>
+          <p class="pdf-text">
+            Declaro que conozco y me hago responsable del origen legal de los metales preciosos (oro) dados en venta y declaro que no provienen de
+            minería ilegal ni de áreas naturales protegidas.
+          </p>
+          <p class="pdf-text">
+            Soy el único beneficiario real de las prendas y/o valores recibidos con motivo del presente contrato de compra - venta.
+          </p>
+          <p class="pdf-text">Inversiones Grupo Kadima S.A NO compra los artículos artesanales nombrados HUACA.</p>
+          <p class="pdf-text">
+            Los mineros que extraen oro deben presentar su licencia al día. INVERSIONES GRUPO KADIMA S.A se reserva el derecho y cumplirá con la
+            obligación de reportar toda actividad sospechosa y de proceder legalmente cuando el cliente provea información falsa.
+          </p>
+          <p class="pdf-text">
+            El cliente fundirá su oro bajo su responsabilidad. INVERSIONES GRUPO KADIMA S.A no se responsabiliza por el peso, pureza o forma del material
+            después de su fundición. Las oficinas cuentan con servicio cerrado de seguridad; usted está siendo filmado.
+          </p>
+          <p class="pdf-text">
+            A solicitud del cliente se cancela esta compra con varios cheques por los siguientes motivos:
+          </p>
+          <ul class="pdf-text">
+            <li>El cliente no necesita disponer de la suma entera a la vez, sino a medida que lo necesite.</li>
+            <li>Minimizar el riesgo de cargar una suma alta a la vez.</li>
+          </ul>
+
+          <div class="pdf-footer-sign">
+            <div class="pdf-signature-box small">
+              <div class="value pdf-signature-line">&nbsp;</div>
+              <div class="label">FIRMA</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
   </div>
 </body>
 </html>
